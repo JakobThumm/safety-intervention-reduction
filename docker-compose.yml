@@ -1,0 +1,84 @@
+version: '3'
+
+services:
+  Goal1:
+    image: safety_shield_pelat:0.5
+    build: .
+    volumes:
+      - ./data:/usr/workspace/data
+      - ./src:/usr/workspace/src
+      - ./app.py:/usr/workspace/app.py
+      - ./config_presets.py:/usr/workspace/config_presets.py
+    user: ${CURRENT_UID}
+    environment:
+      - gym_env=Goal1
+      - exp_name=${EXP_NAME}
+      - replacement_strat=${REPLACE}
+    deploy:
+      restart_policy:
+        condition: none
+      resources:
+        reservations:
+          cpus: "3"
+
+  Goal2:
+    image: safety_shield_pelat:0.5
+    build: .
+    volumes:
+      - ./data:/usr/workspace/data
+      - ./src:/usr/workspace/src
+      - ./app.py:/usr/workspace/app.py
+      - ./config_presets.py:/usr/workspace/config_presets.py
+    user: ${CURRENT_UID}
+    environment:
+      - gym_env=Goal2
+      - exp_name=${EXP_NAME}
+      - replacement_strat=${REPLACE}
+    deploy:
+      restart_policy:
+        condition: none
+      resources:
+        reservations:
+          cpus: "3"  
+          
+  Button1:
+    image: safety_shield_pelat:0.5
+    build: .
+    volumes:
+      - ./data:/usr/workspace/data
+      - ./src:/usr/workspace/src
+      - ./app.py:/usr/workspace/app.py
+      - ./config_presets.py:/usr/workspace/config_presets.py
+    user: ${CURRENT_UID}
+    environment:
+      - gym_env=Button1
+      - exp_name=${EXP_NAME}
+      - replacement_strat=${REPLACE}
+    deploy:
+      restart_policy:
+        condition: none
+      resources:
+        reservations:
+          cpus: "3"  
+
+  Button2:
+    image: safety_shield_pelat:0.5
+    build: .
+    volumes:
+      - ./data:/usr/workspace/data
+      - ./src:/usr/workspace/src
+      - ./app.py:/usr/workspace/app.py
+      - ./config_presets.py:/usr/workspace/config_presets.py
+    user: ${CURRENT_UID}
+    environment:
+      - gym_env=Button2
+      - exp_name=${EXP_NAME}
+      - replacement_strat=${REPLACE}
+    deploy:
+      restart_policy:
+        condition: none
+      resources:
+        reservations:
+          cpus: "3"
+
+# Run with CURRENT_UID=$(id -u):$(id -g) docker-compose up
