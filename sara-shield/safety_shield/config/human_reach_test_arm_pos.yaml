@@ -1,0 +1,38 @@
+# cutains information
+measurement_error_pos: 0.1
+measurement_error_vel: 1.0
+delay: 0.01
+
+# Names of joints in correct outputted order
+joint_names: [
+  "rightShoulder", "rightElbow", "rightWrist"
+]
+joint_v_max: [
+  2, 2, 2
+]
+
+joint_a_max: [
+  50, 50, 50
+]
+
+bodies:
+  - name: "rightUpperArm" 
+    proximal: "rightShoulder"
+    distal: "rightElbow"
+    thickness: 0.1
+
+  - name: "rightLowerArm"
+    proximal: "rightElbow"
+    distal: "rightWrist"
+    thickness: 0.1
+
+  - name: "rightHand"
+    proximal: "rightWrist"
+    distal: "rightWrist"
+    thickness: 0.208
+
+extremities:
+  - name: "rightArm"
+    base: "rightUpperArm"
+    end: "rightHand"
+    length: 0.725

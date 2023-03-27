@@ -1,0 +1,24 @@
+robot_name: dummy
+
+nb_joints: 1
+
+secure_radius: 0.01
+
+transformation_matrices: [
+  1, 0, 0, 0, 
+  0, 0, -1, 0, 
+  0, 1, 0, 0.1, 
+  0, 0, 0, 1, 
+] 
+
+tool_transformation_matrix: [
+  1, 0, 0, 0,
+  0, 1, 0, 0,
+  0, 0, 1, 0.1,
+  0, 0, 0, 1]
+
+enclosures: [
+  0.0, 0.0, 0.0,
+  0.0, -0.1, 0.0,
+  0.01,
+]

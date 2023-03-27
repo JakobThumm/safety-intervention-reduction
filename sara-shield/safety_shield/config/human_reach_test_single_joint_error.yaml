@@ -1,0 +1,24 @@
+# cutains information
+measurement_error_pos: 0.2
+measurement_error_vel: 0.1
+delay: 0.01
+
+# Names of joints in correct outputted order
+joint_names: [
+  "head"
+]
+joint_v_max: [
+  1
+]
+
+joint_a_max: [
+  10
+]
+
+bodies:
+  - name: "head" 
+    proximal: "head"
+    distal: "head"
+    thickness: 0.1
+
+extremities:
