@@ -1,0 +1,6 @@
+robot_name: car
+
+nb_joints: 1
+
+secure_radius: 0.02
+radius: 0.2
