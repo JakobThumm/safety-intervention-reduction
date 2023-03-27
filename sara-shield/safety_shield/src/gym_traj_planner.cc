@@ -23,7 +23,7 @@ namespace safety_shield
         Motion original_goal = planned_motions[planned_motions.size() - 1];
         float best_dist = 10000000;
 
-        if(resample_strat_ == GRID) {
+        if(resample_strat_ == 0) {
             auto rd = std::random_device{};
             auto rng = std::default_random_engine{rd()};
             std::shuffle(std::begin(possible_actions_), std::end(possible_actions_), rng);
@@ -40,7 +40,7 @@ namespace safety_shield
             }
 
         }
-        else if(resample_strat_ == OPPOSITE) {
+        else if(resample_strat_ == 1) {
             int valid_actions_found = 0;
             int total_tries = 0;
             while (valid_actions_found < n_tries_ && total_tries < max_tries_)
@@ -67,7 +67,7 @@ namespace safety_shield
                 }
             }
 
-        } else if(resample_strat_ == RANDOM){
+        } else if(resample_strat_ == 2){
             int valid_actions_found = 0;
             int total_tries = 0;
             while (total_tries < max_tries_)

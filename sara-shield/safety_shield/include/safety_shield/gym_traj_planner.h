@@ -9,9 +9,9 @@
 #ifndef GYM_TRAJ_H
 #define GYM_TRAJ_H
 
-#DEFINE GRID 0
-#DEFINE OPPOSITE 1
-#DEFINE RANDOM 2
+// #DEFINE GRID 0
+// #DEFINE OPPOSITE 1
+// #DEFINE RANDOM 2
 
 namespace safety_shield
 {

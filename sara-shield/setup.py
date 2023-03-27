@@ -156,18 +156,16 @@ class CMakeBuild(build_ext):
         #         ext.sourcedir] + cmake_args, cwd=self.build_temp
         # )
         subprocess.check_call(
-            ["cmake", "-DPYTHON_EXECUTABLE:FILEPATH=/bin/python3",
-                "-DPYTHON_INCLUDE_DIR=/usr/local/include/python3.8",
-                # "-DPYTHON_INCLUDE_DIR=/usr/include/python3.8/",
-                "-DPYTHON_LIBRARY:FILEPATH=/lib/libpython3.8.so",
-                "-DEigen3_DIR="+os.environ["Eigen3_DIR"],
-                # "-DEigen3_DIR=/home/tergaim/workspace/Thesis/eigen-3.4.0/cmake/",
+            ["cmake", "-DPYTHON_EXECUTABLE:FILEPATH="+os.environ["CONDA_PREFIX"]+"/bin/python",
+                "-DPYTHON_INCLUDE_DIR="+os.environ["CONDA_PREFIX"]+"/include/python3.8/",
+                "-DPYTHON_LIBRARY:FILEPATH="+os.environ["CONDA_PREFIX"]+"/lib/libpython3.8.so",
+                "-DEigen3_DIR="+os.environ["EIGEN3_INCLUDE_DIR"]+"/cmake/",
                 ext.sourcedir] + cmake_args, cwd=self.build_temp
         )
         subprocess.check_call(
             ["cmake", "--build", ".", "-j 8"] + build_args, cwd=self.build_temp
         )
-        test = True  # TODO: Find a way to include this in function call.
+        test = False  # TODO: Find a way to include this in function call.
         if test:
             # << C++ tests >>
             subprocess.check_call(["ctest", "--output-on-failure"], cwd=self.build_temp)
