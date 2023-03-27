@@ -43,9 +43,9 @@ ORIGIN_COORDINATES = np.zeros(3)
 DEFAULT_WIDTH = 256
 DEFAULT_HEIGHT = 256
 
-RADIUS_HAZARD = 0.45 # 32 for PID
+RADIUS_HAZARD = 0.20 # 32 for PID
 RADIUS_GREMLIN = 0.20
-RADIUS_VASE = 0.35
+RADIUS_VASE = 0.3
 RADIUS_PILLAR = 0.32
 
 
@@ -186,31 +186,41 @@ class NewEngine(Engine):
         info = {}
         self.failsafe_intervention = False
 
+        ### Action projection or replacement
         # check planned trajectory and select new action if needed 
         # don't need to set the trajectory in the shield since it will get checked again later
-        if self.use_safety_shield and config_shield.N_TRIES_NEW_TRAJ > 0: 
-            self.motion_list = self.plan_trajectory(action, self.world.robot_vel()[:2], self.world.robot_mat()[:2, :2], self.world.body_com("robot")[:2], True)
+        if self.use_safety_shield and config_shield.N_TRIES_NEW_TRAJ > 0:
+            self.motion_list = self.plan_trajectory(
+                action,
+                self.world.robot_vel()[:2],
+                self.world.robot_mat()[:2, :2],
+                self.sim.data.get_body_xpos("robot")[0:2],
+                True
+            )
             action = self.traj_plan.get_action()
 
+        ### Execute action
         # Set action
         self.set_action(action)
 
-        
-
         # Simulate physics forward
         exception = False
-        failsafe_intervention = False
         for _ in range(self.rs.binomial(self.frameskip_binom_n, self.frameskip_binom_p)):
-        # for _ in range(1):
             try:
                 if self.use_safety_shield and not self.failsafe_intervention:
                     # plan long term trajectory
-                    self.motion_list = self.plan_trajectory(action, self.world.robot_vel()[:2], self.world.robot_mat()[:2, :2], self.world.body_com("robot")[:2], False)
+                    self.motion_list = self.plan_trajectory(
+                        action,
+                        self.world.robot_vel()[:2],
+                        self.world.robot_mat()[:2, :2],
+                        self.sim.data.get_body_xpos("robot")[0:2],
+                        False
+                    )
                     action = self.traj_plan.get_action()
                     self.safety_shield.newLongTermTrajectoryFromMotion(self.motion_list)
 
                     # check safety
-                    motion = self.safety_shield.step(self.data.time, Motion(self.data.time, self.world.body_com("robot")[:2]))
+                    motion = self.safety_shield.step(self.data.time, Motion(self.data.time, self.sim.data.get_body_xpos("robot")[0:2]))
                     if self.safety_shield.getSafety() is False:
                         self.failsafe_intervention = True
                         # print("Failsafe")
@@ -280,7 +290,7 @@ class NewEngine(Engine):
     def render_shield(self):
         '''Make obstacle reachable set visible'''
         min_dist = 9999999
-        pos_robot = self.world.body_com("robot")[:2]
+        pos_robot = self.sim.data.get_body_xpos("robot")[0:2]
         for cap in self.safety_shield.getObstacleReachCylinders():
             # min_dist = min(min_dist, np.linalg.norm(pos_robot-cap[:2]))
             self.viewer.add_marker(

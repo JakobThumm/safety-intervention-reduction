@@ -208,7 +208,7 @@ def run_random(env, agent=None):
             if use_agent:
                 act = get_agent_action(obs, act, r)
             else:
-                act = [0.1, 0]
+                act = [0.05, -1]
             obs, r, done, info = env.step(act)
             if VISUALIZE:
                 env.render()

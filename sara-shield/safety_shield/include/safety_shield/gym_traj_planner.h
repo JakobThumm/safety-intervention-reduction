@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 #include <algorithm>
+#include <math.h>
 #include "safety_shield/motion.h"
 
 #ifndef GYM_TRAJ_H
@@ -36,12 +37,13 @@ namespace safety_shield
         /**
          * @brief point robot mass
          */
-        const double point_mass_ = 0.00519;
+        const double point_mass_ = 0.00518879;
 
         /**
-         * @brief regression values for rotation
+         * @brief rotational gear ratio
          */
-        const double angle_a_ = 0.0063;
+        const double gear_rot_ = 3;
+        
         const double angle_b_ = 0.000426;
         inline double regression_angle_point(double action)
         {
@@ -51,16 +53,16 @@ namespace safety_shield
             }
             if (action > 0)
             {
-                return angle_a_ * action + angle_b_;
+                return gear_rot_ * timestep_ * action + angle_b_;
             }
-            return angle_a_ * action - angle_b_;
+            return gear_rot_ * timestep_ * action - angle_b_;
         }
 
         /**
          * @brief values for velocity computation
          */
-        const double gear_ = 0.2989;
-        const double friction_ = 0.00384;
+        const double gear_ = 0.3;
+        const double friction_ = 0.0; // 0.00384;
 
         /**
          * @brief Mujoco timestep

@@ -159,29 +159,19 @@ namespace safety_shield
 
         const double heading = atan2(robot_vel(1), robot_vel(0));
         const double phi = atan2(robot_rot(1, 0), robot_rot(0, 0));
-
-        double turn = (heading - phi);
-        const double HALFPI = 3.14159 / 2;
-
-        while (turn > HALFPI)
-            turn -= 3.14159;
-        while (turn < -HALFPI)
-            turn += 3.14159;
-
-        const double coef = 2;
-        action(1) = coef * turn;
-
-        if (abs(action(1)) < 0.2)
-        {
-            // action(1) = 0;
-            action(0) = -sign(cos(phi) * robot_vel(0) + sin(phi) * robot_vel(1));
+        double acc_opt = -1/timestep_ * (robot_vel(0) * cos(phi) + robot_vel(1) * sin(phi));
+        double v_abs = robot_vel.norm();
+        double delta_theta = 0;
+        if (v_abs > 0.01) {
+            action(0) = acc_opt * point_mass_ / gear_;
+            delta_theta = heading - phi;
+            if (abs(delta_theta) >= M_PI) {
+                delta_theta -= 2 * M_PI * sign(delta_theta);
+            }
         }
-        else
-        {
-            action(1) *= 5;
+        if (abs(delta_theta) > 0.01 && v_abs > 0.1) {
+            action(1) = std::clamp(delta_theta / (gear_rot_ * timestep_), -1.0, 1.0);
         }
-
-        // action = action.cwiseMin(1).cwiseMax(-1);
         return action;
     }
 
