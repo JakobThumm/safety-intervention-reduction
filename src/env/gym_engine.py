@@ -205,9 +205,9 @@ class NewEngine(Engine):
             try:
                 if self.use_safety_shield and not self.failsafe_intervention:
                     # plan long term trajectory
-                    motion_list = self.plan_trajectory(action, self.world.robot_vel()[:2], self.world.robot_mat()[:2, :2], self.world.body_com("robot")[:2], False)
+                    self.motion_list = self.plan_trajectory(action, self.world.robot_vel()[:2], self.world.robot_mat()[:2, :2], self.world.body_com("robot")[:2], False)
                     action = self.traj_plan.get_action()
-                    self.safety_shield.newLongTermTrajectoryFromMotion(motion_list)
+                    self.safety_shield.newLongTermTrajectoryFromMotion(self.motion_list)
 
                     # check safety
                     motion = self.safety_shield.step(self.data.time, Motion(self.data.time, self.world.body_com("robot")[:2]))

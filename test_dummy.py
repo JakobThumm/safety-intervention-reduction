@@ -20,7 +20,8 @@ from tqdm import tqdm
 
 exp_name = "S_PPO" # From config_presets.possible
 env_name = "Safexp-PointGoal1-v1"
-use_agent = True
+use_agent = False
+VISUALIZE = True
 
 def make_env_agent(config):
     env = safety_gym_make(**config["env"])
@@ -81,6 +82,8 @@ def run_random_angle(env_name, config, act):
         #     print("CHANGE")
         last_mat_rot = env.world.robot_mat()[:2, :2]
         obs, reward, done, info = env.step(act)
+        if VISUALIZE:
+            env.render()
 
         mat_rot = env.world.robot_mat()[:2, :2]
         angle = math.atan2(mat_rot[1,0], mat_rot[0,0])
@@ -147,6 +150,8 @@ def run_random_speed(env_name, config):
         else:
             act = [-0.05, 0]
         obs, reward, done, info = env.step(act)
+        if VISUALIZE:
+            env.render()
         velocity = env.world.robot_vel()
         speed = math.sqrt(velocity[0]*velocity[0] + velocity[1]*velocity[1])
         delta = speed - last_speed
@@ -184,6 +189,7 @@ def run_random_speed(env_name, config):
             break
 
 def run_random(env, agent=None):
+    env.seed(0)
     obs = env.reset()
     act = [0,0]
     r = 0
@@ -204,6 +210,8 @@ def run_random(env, agent=None):
             else:
                 act = [0.1, 0]
             obs, r, done, info = env.step(act)
+            if VISUALIZE:
+                env.render()
             # print(f"Before: {act} \t After: {act_2}")
             # print(info)
             t+=1
