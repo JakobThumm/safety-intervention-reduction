@@ -2,5 +2,6 @@ robot_name: point
 
 nb_joints: 1
 
-secure_radius: 0.02
-radius: 0.20
+secure_radius: 0.2
+radius: 0.15
+v_high: 2.0

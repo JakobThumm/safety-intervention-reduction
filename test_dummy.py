@@ -21,7 +21,7 @@ from tqdm import tqdm
 exp_name = "S_PPO" # From config_presets.possible
 env_name = "Safexp-PointGoal1-v1"
 use_agent = False
-VISUALIZE = True
+VISUALIZE = False
 
 def make_env_agent(config):
     env = safety_gym_make(**config["env"])
@@ -197,7 +197,7 @@ def run_random(env, agent=None):
     ep_ret = 0
     ep_cost = 0
     t = 0
-    t_max = 1000
+    t_max = 100
 
     envs = 100
     # while True:

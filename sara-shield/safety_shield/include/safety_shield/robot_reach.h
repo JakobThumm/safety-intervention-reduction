@@ -46,6 +46,7 @@ class RobotReach {
    */
   double secure_radius_;
   double radius_robot_;
+  double v_high_;
 
   /**
    * @brief List of transforamtion matrices from joint to joint (fixed description, not including joint movements)
@@ -78,10 +79,13 @@ public:
    * @param yaw initial yaw of base
    * @param secure_radius Expand the radius of the robot cylinder by this amount to
    *  account for measurement and modelling errors.
+   * @param v_high used for flexible secure radius.
+   *    If the robot is moving with v_high or higher, the maximum secure radius is used.
+   *    If the robot is moving slower than v_high, a relative proportion of the secure radius is used.
    */
   RobotReach(double x, double y, double z, 
       double roll, double pitch, double yaw,
-      double radius, double secure_radius);
+      double radius, double secure_radius, double v_high);
 
   /**
    *  @brief A robot destructor

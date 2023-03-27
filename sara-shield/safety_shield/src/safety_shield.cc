@@ -84,8 +84,9 @@ namespace safety_shield
     nb_joints_ = robot_config["nb_joints"].as<int>();
     double secure_radius = robot_config["secure_radius"].as<double>();
     double radius = robot_config["radius"].as<double>();
+    double v_high = robot_config["v_high"].as<double>();
     robot_reach_ = new RobotReach(init_x, init_y, init_z,
-                                  init_roll, init_pitch, init_yaw, radius, secure_radius);
+                                  init_roll, init_pitch, init_yaw, radius, secure_radius, v_high);
     ////////////// Setting trajectory variables
     // YAML::Node trajectory_config = YAML::LoadFile(trajectory_config_file);
     // max_s_stop_ = trajectory_config["max_s_stop"].as<double>();

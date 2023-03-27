@@ -3,9 +3,10 @@
 namespace safety_shield
 {
 
-  RobotReach::RobotReach(double x = 0, double y = 0, double z = 0, double roll = 0, double pitch = 0, double yaw = 0, double radius = 0.5, double secure_radius = 0.0) : nb_joints_(1),
+  RobotReach::RobotReach(double x = 0, double y = 0, double z = 0, double roll = 0, double pitch = 0, double yaw = 0, double radius = 0.5, double secure_radius = 0.0, double v_high = 1.0) : nb_joints_(1),
                                                                                                                                                                          radius_robot_(radius),
-                                                                                                                                                                         secure_radius_(secure_radius)
+                                                                                                                                                                         secure_radius_(secure_radius),
+                                                                                                                                                                         v_high_(v_high)
   {
     Eigen::Matrix4d transformation_matrix;
     double cr = cos(roll);
@@ -111,6 +112,11 @@ namespace safety_shield
     {
       std::vector<reach_lib::Capsule> reach_capsules;
       reach_capsules.reserve(path.size()-start_on_path-1);
+      // Dynamic secure radius based on velocity of the robot at the start of the trajectory.
+      double v_0 = sqrt(path[start_on_path].getVelocity()[0]*path[start_on_path].getVelocity()[0] +
+                        path[start_on_path].getVelocity()[1]*path[start_on_path].getVelocity()[1]);
+      double v_proportion = std::min(v_0 / v_high_, 1.0);
+      double radius = radius_robot_ + v_proportion * secure_radius_;
       for (int i = start_on_path; i < path.size()-1; i++)
       {
         // build cylinder
@@ -119,7 +125,6 @@ namespace safety_shield
         // Caculate center of ball enclosing point p2 before and after
         std::vector<double> p2 = path[i+1].getPos();
         reach_lib::Point p_2_k = reach_lib::Point(p2[0], p2[1], 0);
-        double radius = radius_robot_ + secure_radius_;
         reach_capsules.push_back(reach_lib::Capsule(p_1_k, p_2_k, radius));
       }
       return reach_capsules;

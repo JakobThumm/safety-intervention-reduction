@@ -43,9 +43,9 @@ ORIGIN_COORDINATES = np.zeros(3)
 DEFAULT_WIDTH = 256
 DEFAULT_HEIGHT = 256
 
-RADIUS_HAZARD = 0.20 # 32 for PID
+RADIUS_HAZARD = 0.18 # 32 for PID
 RADIUS_GREMLIN = 0.20
-RADIUS_VASE = 0.3
+RADIUS_VASE = 0.35
 RADIUS_PILLAR = 0.32
 
 
@@ -207,7 +207,7 @@ class NewEngine(Engine):
         exception = False
         for _ in range(self.rs.binomial(self.frameskip_binom_n, self.frameskip_binom_p)):
             try:
-                if self.use_safety_shield and not self.failsafe_intervention:
+                if self.use_safety_shield: # and not self.failsafe_intervention:
                     # plan long term trajectory
                     self.motion_list = self.plan_trajectory(
                         action,
@@ -234,6 +234,7 @@ class NewEngine(Engine):
                 self.set_mocaps()
                 self.set_obstacle_measurement()
                 self.sim.step()  # Physics simulation step
+                self.render()
 
             except MujocoException as me:
                 print('MujocoException', me)
@@ -313,7 +314,7 @@ class NewEngine(Engine):
             pos = futuremotion.getPos()
             self.viewer.add_marker(
                 pos= [pos[0], pos[1], 0],
-                size=np.array([1, 1, 0]) * 0.3 + np.array([0, 0, 0.01]),
+                size=np.array([1, 1, 0]) * 0.17 + np.array([0, 0, 0.01]),
                 type=const.GEOM_CYLINDER,
                 rgba=COLOR_TRAJ,
                 label=""

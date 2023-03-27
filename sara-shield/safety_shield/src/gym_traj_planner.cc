@@ -163,14 +163,22 @@ namespace safety_shield
         double v_abs = robot_vel.norm();
         double delta_theta = 0;
         if (v_abs > 0.01) {
-            action(0) = acc_opt * point_mass_ / gear_;
+            action(0) = std::clamp(acc_opt * point_mass_ / gear_, -0.05, 0.05);
             delta_theta = heading - phi;
             if (abs(delta_theta) >= M_PI) {
                 delta_theta -= 2 * M_PI * sign(delta_theta);
             }
         }
         if (abs(delta_theta) > 0.01 && v_abs > 0.1) {
-            action(1) = std::clamp(delta_theta / (gear_rot_ * timestep_), -1.0, 1.0);
+            double act_theta = delta_theta;
+            if (abs(delta_theta) > M_PI/2) {
+                if (delta_theta > 0) {
+                    act_theta = delta_theta - M_PI;
+                } else {
+                    act_theta = delta_theta + M_PI;
+                }
+            }
+            action(1) = std::clamp(act_theta / (gear_rot_ * timestep_), -1.0, 1.0);
         }
         return action;
     }
