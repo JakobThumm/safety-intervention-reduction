@@ -31,6 +31,8 @@ class ConfigShield:
             self.REPLACEMENT_STRAT = 1
         elif cfg["replacement_strat"] == "opposite":
             self.REPLACEMENT_STRAT = 2
+        elif cfg["replacement_strat"] == "project":
+            self.REPLACEMENT_STRAT = 3
 
     def activate_shield(self, activate):
         '''Toggle shield activation'''

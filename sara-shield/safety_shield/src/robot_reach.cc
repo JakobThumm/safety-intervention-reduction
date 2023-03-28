@@ -113,8 +113,8 @@ namespace safety_shield
       std::vector<reach_lib::Capsule> reach_capsules;
       reach_capsules.reserve(path.size()-start_on_path-1);
       // Dynamic secure radius based on velocity of the robot at the start of the trajectory.
-      double v_0 = sqrt(path[start_on_path].getVelocity()[0]*path[start_on_path].getVelocity()[0] +
-                        path[start_on_path].getVelocity()[1]*path[start_on_path].getVelocity()[1]);
+      double v_0 = sqrt(path[0].getVelocity()[0]*path[0].getVelocity()[0] +
+                        path[0].getVelocity()[1]*path[0].getVelocity()[1]);
       double v_proportion = std::min(v_0 / v_high_, 1.0);
       double radius = radius_robot_ + v_proportion * secure_radius_;
       for (int i = start_on_path; i < path.size()-1; i++)

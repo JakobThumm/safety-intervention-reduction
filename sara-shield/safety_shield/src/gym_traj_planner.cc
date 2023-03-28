@@ -12,8 +12,10 @@ namespace safety_shield
         std::vector<Motion> planned_motions;
         planned_motions.reserve(steps_ahead_);
 
-
-        double safety_radius = safety_buffer_ + 0.15 * policy_step;
+        double v_0 = sqrt(robot_vel[0]*robot_vel[0] +
+                          robot_vel[1]*robot_vel[1]);
+        double v_proportion = std::min(v_0 / 2.0, 1.0);
+        double safety_radius = safety_buffer_ + 0.02 * policy_step + v_proportion * secure_radius_;
         bool initial_loop_ok = planner_point_loop(action, robot_vel, robot_rot, robot_com, policy_step, safety_radius, planned_motions);
 
         if (!policy_step || initial_loop_ok || n_tries_ < 1)
@@ -22,7 +24,7 @@ namespace safety_shield
 
         Motion original_goal = planned_motions[planned_motions.size() - 1];
         float best_dist = 10000000;
-
+        // GRID
         if(resample_strat_ == 0) {
             auto rd = std::random_device{};
             auto rng = std::default_random_engine{rd()};
@@ -30,7 +32,7 @@ namespace safety_shield
             for(Eigen::Vector2d resampled_action : possible_actions_) {
                 std::vector<Motion> replanned_motions;
                 replanned_motions.reserve(steps_ahead_);
-                bool loop_ok = planner_point_loop(resampled_action, robot_vel, robot_rot, robot_com, policy_step, safety_buffer_, replanned_motions);
+                bool loop_ok = planner_point_loop(resampled_action, robot_vel, robot_rot, robot_com, policy_step, safety_radius, replanned_motions);
 
                 if (loop_ok)
                 {
@@ -40,6 +42,7 @@ namespace safety_shield
             }
 
         }
+        // RANDOM
         else if(resample_strat_ == 1) {
             int valid_actions_found = 0;
             int total_tries = 0;
@@ -51,7 +54,7 @@ namespace safety_shield
                 Eigen::Vector2d resampled_action = Eigen::Vector2d::Random(); // select random action in [-0.05; 0.05] x [-1,1], ctrl range limits
                 resampled_action(0) *= 0.05;
 
-                bool loop_ok = planner_point_loop(resampled_action, robot_vel, robot_rot, robot_com, policy_step, safety_buffer_, replanned_motions);
+                bool loop_ok = planner_point_loop(resampled_action, robot_vel, robot_rot, robot_com, policy_step, safety_radius, replanned_motions);
 
                 if (loop_ok)
                 {
@@ -66,7 +69,7 @@ namespace safety_shield
                     }
                 }
             }
-
+        // OPPOSITE
         } else if(resample_strat_ == 2){
             int valid_actions_found = 0;
             int total_tries = 0;
@@ -82,13 +85,56 @@ namespace safety_shield
                 else if(resampled_action(1) > 0.33)  {resampled_action(1) = 1;}
                 else {{resampled_action(1) = 0;}}
 
-                bool loop_ok = planner_point_loop(resampled_action, robot_vel, robot_rot, robot_com, policy_step, safety_buffer_, replanned_motions);
+                bool loop_ok = planner_point_loop(resampled_action, robot_vel, robot_rot, robot_com, policy_step, safety_radius, replanned_motions);
 
                 if (loop_ok)
                 {
                     planned_motions = replanned_motions;
                     Eigen::Map<Eigen::Vector2d>(selected_action_.data(), selected_action_.size()) = resampled_action;
                     break;
+                }
+            }
+        }
+        // PROJECTION
+        else if (resample_strat_ == 3){
+            std::vector<Motion> replanned_motions;
+            replanned_motions.reserve(steps_ahead_);
+            // Optimal acceleration for braking
+            double heading = atan2(robot_vel(1), robot_vel(0));
+            double phi = atan2(robot_rot(1, 0), robot_rot(0, 0));
+            double acc_opt = -1/timestep_ * (robot_vel(0) * cos(phi) + robot_vel(1) * sin(phi));
+            double v_abs = robot_vel.norm();
+            double u_1_opt = std::clamp(acc_opt * point_mass_ / gear_, -0.05, 0.05);
+            double d_u_1 = u_1_opt - action(0);
+            double delta_theta = heading - phi;
+            if (abs(delta_theta) >= M_PI) {
+                delta_theta -= 2 * M_PI * sign(delta_theta);
+            }
+            double act_theta = delta_theta;
+            if (abs(delta_theta) > M_PI/2) {
+                if (delta_theta > 0) {
+                    act_theta = delta_theta - M_PI;
+                } else {
+                    act_theta = delta_theta + M_PI;
+                }
+            }
+            double u_2_opt = std::clamp(act_theta / (gear_rot_ * timestep_), -1.0, 1.0);
+            double d_u_2 = u_2_opt - action(1);
+            // Check by how much we need to change velocity and steering angle to find solution.
+            bool loop_ok = false;
+            for (int i = 0; i <= max_tries_; i++){
+                Eigen::Vector2d projected_action = action;
+                projected_action(0) += i * d_u_1/max_tries_;
+                projected_action(1) += i * d_u_2/max_tries_;
+                loop_ok = planner_point_loop(projected_action, robot_vel, robot_rot, robot_com, policy_step, safety_radius, replanned_motions);
+                if (loop_ok){
+                    planned_motions = replanned_motions;
+                    Eigen::Map<Eigen::Vector2d>(selected_action_.data(), selected_action_.size()) = projected_action;
+                    break;
+                }
+                if (i == max_tries_){
+                    planned_motions = replanned_motions;
+                    Eigen::Map<Eigen::Vector2d>(selected_action_.data(), selected_action_.size()) = projected_action;
                 }
             }
         }

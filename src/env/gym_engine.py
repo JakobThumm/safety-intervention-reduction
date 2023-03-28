@@ -95,7 +95,7 @@ class NewEngine(Engine):
         obstacle_radius.extend([RADIUS_HAZARD for _ in hazards_pos_])
         obstacle_moves = [False for _ in obstacle_pos]
 
-        self.traj_plan = GymTrajPlanner(300, sample_time, [obstacle[:2] for obstacle in obstacle_pos], obstacle_radius, config_shield.N_TRIES_NEW_TRAJ, config_shield.MAX_TRIES_NEW_TRAJ, 0.25, config_shield.REPLACEMENT_STRAT)
+        self.traj_plan = GymTrajPlanner(300, sample_time, [obstacle[:2] for obstacle in obstacle_pos], obstacle_radius, config_shield.N_TRIES_NEW_TRAJ, config_shield.MAX_TRIES_NEW_TRAJ, 0.15, config_shield.REPLACEMENT_STRAT)
         gremlins_pos_ = self.gremlins_obj_pos
 
         obstacle_pos.extend(gremlins_pos_)

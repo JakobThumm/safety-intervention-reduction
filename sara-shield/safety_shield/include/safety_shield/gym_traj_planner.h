@@ -96,6 +96,9 @@ namespace safety_shield
         */
         int resample_strat_ = 0;
 
+        double v_high_ = 2.0;
+        double secure_radius_ = 0.2;
+
     public:
         /**
          * @brief Construct a new GymTrajPlanner object

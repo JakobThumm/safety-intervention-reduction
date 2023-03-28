@@ -91,8 +91,8 @@ config = dict(
         n_traj_new_tries = 0,
         max_traj_new_tries = 20,
         n_seeds = 3,
-        replacement_strat = "grid", # only if n_traj_new_tries > 0; 
-        # from grid, random, opposite
+        replacement_strat = "project", # only if n_traj_new_tries > 0; 
+        # from grid, random, opposite, project
     ),
 )
 
@@ -100,9 +100,16 @@ configs["S_PPO"] = copy.deepcopy(config)
 
 
 config["other"]["n_traj_new_tries"] = 1
+config["other"]["replacement_strat"] = "grid"
 configs["S_PPO_Replacement"] = copy.deepcopy(config)
 
+config["other"]["n_traj_new_tries"] = 1
+config["other"]["max_traj_new_tries"] = 5
+config["other"]["replacement_strat"] = "project"
+configs["S_PPO_Projection"] = copy.deepcopy(config)
+
 config["other"]["n_traj_new_tries"] = 0
+config["other"]["max_traj_new_tries"] = 20
 config["other"]["reward_shield"] = True
 configs["S_PPO_Reward"] = copy.deepcopy(config)
 
