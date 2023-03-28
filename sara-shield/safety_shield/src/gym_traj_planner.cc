@@ -15,7 +15,7 @@ namespace safety_shield
         double v_0 = sqrt(robot_vel[0]*robot_vel[0] +
                           robot_vel[1]*robot_vel[1]);
         double v_proportion = std::min(v_0 / 2.0, 1.0);
-        double safety_radius = safety_buffer_ + 0.02 * policy_step + v_proportion * secure_radius_;
+        double safety_radius = safety_buffer_ + 0.05 * policy_step + v_proportion * secure_radius_;
         bool initial_loop_ok = planner_point_loop(action, robot_vel, robot_rot, robot_com, policy_step, safety_radius, planned_motions);
 
         if (!policy_step || initial_loop_ok || n_tries_ < 1)
