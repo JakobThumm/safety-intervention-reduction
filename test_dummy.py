@@ -18,7 +18,7 @@ from src.gym_wrapper import SafetyGymTrajInfo, safety_gym_make
 from src.runner import MinibatchRl
 from tqdm import tqdm
 
-exp_name = "S_PPO" # From config_presets.possible
+exp_name = "S_PPO_Projection" # From config_presets.possible
 env_name = "Safexp-PointGoal1-v1"
 use_agent = False
 VISUALIZE = False
@@ -208,7 +208,7 @@ def run_random(env, agent=None):
             if use_agent:
                 act = get_agent_action(obs, act, r)
             else:
-                act = [0.05, -1]
+                act = [0.05, -1.0]
             obs, r, done, info = env.step(act)
             if VISUALIZE:
                 env.render()
