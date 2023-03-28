@@ -1,13 +1,14 @@
+"""Configurations for the experiments."""
 import copy
+from config_custom import config_custom
+
 
 configs = dict()
-
-from config_custom import config_custom
 configs["Custom"] = copy.deepcopy(config_custom)
 
 config = dict(
     env=dict(
-        id="Safexp-PointGoal1-v0", # is overriden in app.py
+        id="Safexp-PointGoal1-v0",  # is overriden in app.py
         obs_prev_cost=True,
         obs_version="default",
     ),
@@ -75,7 +76,7 @@ config = dict(
     runner=dict(
         n_steps=2e6,
         log_interval_steps=1e5,
-        seed=0, # overriden by the n_seeds parameter below
+        seed=0,  # overriden by the n_seeds parameter below
         cost_limit_linear_decrease=False,
         cost_limit_end_value=25,
     ),
@@ -83,44 +84,49 @@ config = dict(
     log_dir="test",
     run_ID="0",
     use_lstm=False,
-    other =dict(
-        activate_shield = True,
-        reward_shield = False,
-        reward_penalty = 0.1,
-        constrain_shield = False,
-        n_traj_new_tries = 0,
-        max_traj_new_tries = 20,
-        n_seeds = 3,
-        replacement_strat = "project", # only if n_traj_new_tries > 0; 
+    other=dict(
+        activate_shield=True,
+        reward_shield=False,
+        reward_penalty=0.1,
+        constrain_shield=False,
+        n_traj_new_tries=0,
+        max_traj_new_tries=20,
+        n_seeds=3,
+        replacement_strat="random",  # only if n_traj_new_tries > 0;
         # from grid, random, opposite, project
     ),
 )
 
-configs["S_PPO"] = copy.deepcopy(config)
+# Shielded PPO
+configs["Shielded_PPO"] = copy.deepcopy(config)
 
+# Shielded PPO with replacement
+configs["Shielded_PPO_Replacement"] = copy.deepcopy(config)
+configs["Shielded_PPO_Replacement"]["other"]["n_traj_new_tries"] = 1
+configs["Shielded_PPO_Replacement"]["other"]["replacement_strat"] = "grid"
 
-config["other"]["n_traj_new_tries"] = 1
-config["other"]["replacement_strat"] = "grid"
-configs["S_PPO_Replacement"] = copy.deepcopy(config)
+# Shielded PPO with projection
+configs["Shielded_PPO_Projection"] = copy.deepcopy(config)
+configs["Shielded_PPO_Projection"]["other"]["n_traj_new_tries"] = 1
+configs["Shielded_PPO_Projection"]["other"]["max_traj_new_tries"] = 5
+configs["Shielded_PPO_Projection"]["other"]["replacement_strat"] = "project"
 
-config["other"]["n_traj_new_tries"] = 1
-config["other"]["max_traj_new_tries"] = 5
-config["other"]["replacement_strat"] = "project"
-configs["S_PPO_Projection"] = copy.deepcopy(config)
+# Shielded PPO with reward penalty
+configs["Shielded_PPO_Reward"] = copy.deepcopy(config)
+configs["Shielded_PPO_Reward"]["other"]["max_traj_new_tries"] = 20
+configs["Shielded_PPO_Reward"]["other"]["reward_shield"] = True
 
-config["other"]["n_traj_new_tries"] = 0
-config["other"]["max_traj_new_tries"] = 20
-config["other"]["reward_shield"] = True
-configs["S_PPO_Reward"] = copy.deepcopy(config)
+# Shielded PID Lagrangian
+configs["Shielded_PID"] = copy.deepcopy(config)
+configs["Shielded_PID"]["other"]["reward_shield"] = False
+configs["Shielded_PID"]["other"]["constrain_shield"] = True
+configs["Shielded_PID"]["algo"]["cost_limit"] = 450
 
-config["other"]["reward_shield"] = False
-config["other"]["constrain_shield"] = True
-config["algo"]["cost_limit"] = 450
-configs["S_PID"] = copy.deepcopy(config)
+configs["search"]["Constraint_Search"] = copy.deepcopy(config)
+configs["search"]["Constraint_Search"]["other"]["reward_shield"] = False
+configs["search"]["Constraint_Search"]["other"]["constrain_shield"] = True
+configs["search"]["Constraint_Search"]["algo"]["cost_limit"] = 250
 
-config["other"]["n_traj_new_tries"] = 1
-config["algo"]["cost_limit"] = 250
-configs["Constraint_Search"] = copy.deepcopy(config)
-configs["S_PID_Replacement"] = copy.deepcopy(config)
-
-possible = ["S_PPO", "S_PPO_Replacement", "S_PPO_Reward", "S_PID", "S_PID_Replacement"]
+configs["search"]["Reward_Search"] = copy.deepcopy(config)
+configs["search"]["Reward_Search"]["other"]["reward_shield"] = True
+configs["search"]["Reward_Search"]["other"]["constrain_shield"] = False

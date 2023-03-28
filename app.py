@@ -14,8 +14,7 @@ import os
 
 
 def make_runner(config):
-    """Initialize all elements needed for training. """
-
+    """Initialize all elements needed for training."""
     affinity = affinity_from_code(config["slot_affinity_code"])
     sampler = CpuSampler(
         EnvCls=safety_gym_make,
@@ -35,8 +34,9 @@ def make_runner(config):
     )
     return runner
 
+
 def train_regular(config, exp_name, env_name):
-    """Trains an experiment on multiple seeds"""
+    """Train an experiment on multiple seeds."""
     seeds = [0]
     if config["other"]["n_seeds"] > 1:
         seeds = [i*10 for i in range(config["other"]["n_seeds"])]
@@ -51,10 +51,10 @@ def train_regular(config, exp_name, env_name):
             runner.train()
 
         run_ID = str(int(run_ID) + 1)
-        
+
 
 def constraint_search(config, exp_name, env_name):
-    """Trains for multiple cost limit values with a constrained shield"""
+    """Train for multiple cost limit values with a constrained shield."""
     costs = [150, 200, 250, 300, 350, 400]
 
     run_ID = config["run_ID"]
@@ -69,13 +69,12 @@ def constraint_search(config, exp_name, env_name):
             runner.train()
 
         run_ID = str(int(run_ID) + 1)
-    
 
 def reward_search(config, exp_name, env_name):
-    """Trains for multiple shield penalty values"""  
+    """Train for multiple shield penalty values."""
     run_ID = config["run_ID"]
 
-    for rwd in [-1,-0.1,-0.01]:
+    for rwd in [-1, -0.1, -0.01]:
         config["other"]["reward_penalty"] = rwd
         config["env"]["id"] = env_name
         config_shield.update_config(config)
@@ -99,17 +98,14 @@ if __name__ == "__main__":
         replacement_strat = os.environ["replacement_strat"]
     except KeyError:
         print(f"No replacement strategy given. Defaulting to {configs[exp_name]['other']['replacement_strat']}.")
-    
+
     configs[exp_name]["other"]["replacement_strat"] = replacement_strat
 
-    if exp_name in ["S_PPO", "S_PPO_Replacement", "S_PPO_Reward", "S_PID", "S_PID_Replacement", "Custom"]:
+    if exp_name in configs.keys():
         train_regular(configs[exp_name], f"{exp_name}_{replacement_strat}", env_name)
-    
     elif exp_name == "Constraint_Search":
-        constraint_search(configs[exp_name], f"{exp_name}_{replacement_strat}", env_name)
-
+        constraint_search(configs["search"][exp_name], f"{exp_name}_{replacement_strat}", env_name)
     elif exp_name == "RewardSearch":
-        reward_search(configs[exp_name], f"{exp_name}_{replacement_strat}", env_name)
-    
+        reward_search(configs["search"][exp_name], f"{exp_name}_{replacement_strat}", env_name)
     else:
         raise NotImplementedError("The required experiment has not been properly defined.")
