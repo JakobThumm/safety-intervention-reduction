@@ -234,7 +234,7 @@ class NewEngine(Engine):
                 self.set_mocaps()
                 self.set_obstacle_measurement()
                 self.sim.step()  # Physics simulation step
-                self.render()
+                # self.render()
 
             except MujocoException as me:
                 print('MujocoException', me)
