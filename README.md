@@ -23,6 +23,8 @@ Training data will be saved in `./data/local/YYYYMMDD/hhmmss/env_name`. If they 
 **If omitting `CURRENT_UID=$(id -u):$(id -g)` in the launch command, saved data will be owned by the root user.**
 The `STACK_NAME` parameter is used to differentiate between different [docker stacks](https://docs.docker.com/engine/reference/commandline/stack_deploy/) and can be set to your convenience (but should not be omitted).
 
+Alternatively to `docker stack`, one can also use `CURRENT_UID=$(id -u):$(id -g) EXP_NAME=XXX docker-compose up`.
+
 To select an experiment, one must modify the exp_name parameter can be chosen among the following:
  - `Shielded_PPO`: PPO with provably safe shield that stops the agent from colliding. 
     ```[bash]

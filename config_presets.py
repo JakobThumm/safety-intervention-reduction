@@ -122,6 +122,7 @@ configs["Shielded_PID"]["other"]["reward_shield"] = False
 configs["Shielded_PID"]["other"]["constrain_shield"] = True
 configs["Shielded_PID"]["algo"]["cost_limit"] = 450
 
+configs["search"] = dict()
 configs["search"]["Constraint_Search"] = copy.deepcopy(config)
 configs["search"]["Constraint_Search"]["other"]["reward_shield"] = False
 configs["search"]["Constraint_Search"]["other"]["constrain_shield"] = True
