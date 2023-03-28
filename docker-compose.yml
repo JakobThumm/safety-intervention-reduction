@@ -2,8 +2,9 @@ version: '3'
 
 services:
   Goal1:
-    image: safety_shield_pelat:0.5
-    build: .
+    image: safety_intervention_reduction:1.0
+    build:
+      context: .
     volumes:
       - ./data:/usr/workspace/data
       - ./src:/usr/workspace/src
@@ -22,8 +23,9 @@ services:
           cpus: "3"
 
   Goal2:
-    image: safety_shield_pelat:0.5
-    build: .
+    image: safety_intervention_reduction:1.0
+    build:
+      context: .
     volumes:
       - ./data:/usr/workspace/data
       - ./src:/usr/workspace/src
@@ -42,8 +44,9 @@ services:
           cpus: "3"  
           
   Button1:
-    image: safety_shield_pelat:0.5
-    build: .
+    image: safety_intervention_reduction:1.0
+    build:
+      context: .
     volumes:
       - ./data:/usr/workspace/data
       - ./src:/usr/workspace/src
@@ -62,8 +65,9 @@ services:
           cpus: "3"  
 
   Button2:
-    image: safety_shield_pelat:0.5
-    build: .
+    image: safety_intervention_reduction:1.0
+    build:
+      context: .
     volumes:
       - ./data:/usr/workspace/data
       - ./src:/usr/workspace/src

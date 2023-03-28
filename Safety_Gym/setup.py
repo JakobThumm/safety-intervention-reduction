@@ -11,7 +11,7 @@ setup(
     name='safety_gym',
     packages=['safety_gym'],
     install_requires=[
-        'gym==0.21',
+        'gym==0.23',
         'joblib>=1.1.1',
         'mujoco_py==2.1.2.14',
         'numpy>=1.17.4',

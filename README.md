@@ -8,8 +8,12 @@ It is designed to work in a Docker container.
 
 ## Installation
 
+[Download Eigen3.4](https://gitlab.com/libeigen/eigen/-/releases/3.4.0) to this repository and unpack.
+Set the following environment variable (e.g. in your `~/.bashrc`):
+`export EIGEN3_INCLUDE_DIR="[path_to_this_repo]/eigen-3.4.0"`
+
 The fastest way to use this code is with docker.
-It currently uses the safety_shield_pelat:0.3 image which can be built with `docker-compose build`.
+It currently uses the `safety_intervention_reduction:1.0` image which can be built with `docker-compose build`.
 
 ## Run an experiment
 

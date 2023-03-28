@@ -39,8 +39,8 @@ WORKDIR /usr/
 
 COPY . /usr/workspace/
 WORKDIR /usr/workspace/eigen-3.4.0/build
-RUN cmake ..
-ENV Eigen3_DIR="/usr/workspace/eigen-3.4.0/build"
+RUN cmake .. && make install
+ENV EIGEN3_INCLUDE_DIR="/usr/workspace/eigen-3.4.0/"
 
 WORKDIR /usr/workspace/Safety_Gym
 RUN python3 -m pip install -e .
@@ -50,6 +50,7 @@ RUN python3 -m pip install -r requirements.txt
 
 COPY . /usr/workspace/
 WORKDIR /usr/workspace/sara-shield
+RUN mv setup_no_conda.py setup.py
 RUN rm -r safety_shield/build && python3 setup.py install
 
 RUN sudo chmod -R 777 /usr/local/lib/python3.8/site-packages/mujoco_py/generated
