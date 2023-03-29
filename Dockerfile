@@ -42,7 +42,7 @@ WORKDIR /usr/workspace/
 RUN wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz && \
     tar -xf eigen-3.4.0.tar.gz && \
     rm eigen-3.4.0.tar.gz && \
-    mv eigen-* eigen-3.4.0 && \
+    # mv eigen-* eigen-3.4.0 && \
     mkdir eigen-3.4.0/build
 WORKDIR /usr/workspace/eigen-3.4.0/build
 RUN cmake .. && make install
