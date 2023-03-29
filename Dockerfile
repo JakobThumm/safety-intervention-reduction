@@ -38,8 +38,8 @@ ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/.mujoco/mujoco210/bin"
 WORKDIR /usr/
 
 COPY . /usr/workspace/
-WORKDIR /usr/workspace/eigen-3.4.0/build
-RUN cmake .. && make install
+# WORKDIR /usr/workspace/eigen-3.4.0/build
+# RUN cmake .. && make install
 ENV EIGEN3_INCLUDE_DIR="/usr/workspace/eigen-3.4.0/"
 
 WORKDIR /usr/workspace/Safety_Gym
