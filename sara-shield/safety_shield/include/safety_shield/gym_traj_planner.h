@@ -40,29 +40,32 @@ namespace safety_shield
         const double point_mass_ = 0.00518879;
 
         /**
-         * @brief rotational gear ratio
-         */
-        const double gear_rot_ = 3;
-        
-        const double angle_b_ = 0.000426;
-        inline double regression_angle_point(double action)
-        {
-            if (abs(action) < 0.1)
-            {
-                return 0;
-            }
-            if (action > 0)
-            {
-                return gear_rot_ * timestep_ * action + angle_b_;
-            }
-            return gear_rot_ * timestep_ * action - angle_b_;
-        }
-
-        /**
-         * @brief values for velocity computation
+         * @brief gear ratio from point xml
          */
         const double gear_ = 0.3;
-        const double friction_ = 0.0; // 0.00384;
+        /**
+         * @brief friction from point xml (almost no effect)
+         */
+        const double friction_ = 0.01;
+        /**
+         * @brief damping from point xml (strong effect)
+         */
+        const double damping_ = 0.01;
+        const double gravity_ = 9.81;
+        const double u0_max = 0.05;
+        const double u1_max = 1.0;
+
+        inline double rotation_action(double action)
+        {
+            action = std::clamp(action, -u1_max, u1_max);
+            double abs_steer = abs(action);
+            abs_steer = std::max(0.0, abs_steer - 0.09);
+            if (action >= 0) {
+                return 1/gear_ * timestep_ * abs_steer;
+            } else {
+                return -1/gear_ * timestep_ * abs_steer;
+            }   
+        }
 
         /**
          * @brief Mujoco timestep

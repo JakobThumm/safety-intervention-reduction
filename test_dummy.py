@@ -18,10 +18,11 @@ from src.gym_wrapper import SafetyGymTrajInfo, safety_gym_make
 from src.runner import MinibatchRl
 from tqdm import tqdm
 
-exp_name = "S_PPO_Projection" # From config_presets.possible
+exp_name = "Shielded_PPO" # From config_presets.possible
 env_name = "Safexp-PointGoal1-v1"
 use_agent = False
-VISUALIZE = False
+VISUALIZE = True
+AGENT_PATH = "/home/jakob/Promotion/code/safety-intervention-reduction/data/local/20230328/205546/PointGoal1/run_Shielded_PPO_0/params.pkl"
 
 def make_env_agent(config):
     env = safety_gym_make(**config["env"])
@@ -29,7 +30,7 @@ def make_env_agent(config):
 
     if use_agent:
         configs[exp_name]["env"]["id"] = env_name
-        load_path ="params.pkl"
+        load_path = AGENT_PATH
         checkpoint = torch.load(load_path)
         initial_model_state_dict = checkpoint["agent_state_dict"]
         agent = CppoAgent(model_kwargs=config["model"], initial_model_state_dict=initial_model_state_dict, **config["agent"])
@@ -189,7 +190,7 @@ def run_random_speed(env_name, config):
             break
 
 def run_random(env, agent=None):
-    env.seed(0)
+    env.seed(1)
     obs = env.reset()
     act = [0,0]
     r = 0
@@ -197,7 +198,7 @@ def run_random(env, agent=None):
     ep_ret = 0
     ep_cost = 0
     t = 0
-    t_max = 100
+    t_max = 300
 
     envs = 100
     # while True:
@@ -208,22 +209,23 @@ def run_random(env, agent=None):
             if use_agent:
                 act = get_agent_action(obs, act, r)
             else:
-                act = [0.05, -1.0]
+                act = [0.03, -0.3]
             obs, r, done, info = env.step(act)
+            ep_ret += r
             if VISUALIZE:
                 env.render()
             # print(f"Before: {act} \t After: {act_2}")
             # print(info)
-            t+=1
+            t += 1
             if t >= t_max:
                 done = True
                 t = 0
             ep_cost += info.shield_active
             if done:
-                print('Episode Return: %.3f \t Shield Cost: %.3f'%(ep_ret, ep_cost))
-                # ep_ret, ep_cost = 0, 0
+                print('Episode Return: %.3f \t Shield Cost: %.0f \t Cummulative Cost: %.0f'%(ep_ret, ep_cost, info.cum_cost))
+                ep_ret, ep_cost = 0, 0
                 obs = env.reset()
-                act = [0,0]
+                act = [0, 0]
                 r = 0
         # if info.cost_shield > 0:
         #     if t==1:
@@ -235,7 +237,7 @@ def run_random(env, agent=None):
 if __name__ == "__main__":
     # Register Safety Gym v1 environments (with shield use)
     register_all()
-    
+
     config = configs[exp_name]
     config["env"]["id"] = env_name
     # config["other"]["activate_shield"] = False
@@ -246,6 +248,3 @@ if __name__ == "__main__":
 
     # for act1 in range(1,11):
     #     run_random_angle(env_name, config, [0,act1/10])
-
-
-

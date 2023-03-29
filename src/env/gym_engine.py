@@ -466,6 +466,7 @@ class NewEngine(Engine):
                 h_dist = self.dist_xy(h_pos)
                 if h_dist <= self.hazards_size:
                     cost['cost_hazards'] += self.hazards_cost * (self.hazards_size - h_dist)
+                    # print(f'Hazard cost: {cost["cost_hazards"]}')
 
         if self.constrain_shield and self.failsafe_intervention:
             cost['cost_shield'] = 1

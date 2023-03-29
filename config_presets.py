@@ -14,11 +14,11 @@ config = dict(
     ),
     sampler=dict(
         batch_T=128,
-        batch_B=20,  # Might bust memory limits.
+        batch_B=3,  # Might bust memory limits.
         max_decorrelation_steps=1000,
         eval_n_envs=3,
-        eval_max_steps=1e4,
-        eval_max_trajectories=100,
+        eval_max_steps=3000,
+        eval_max_trajectories=3,
     ),
     algo=dict(
         discount=0.99,
@@ -75,7 +75,7 @@ config = dict(
     ),
     runner=dict(
         n_steps=2e6,
-        log_interval_steps=1e5,
+        log_interval_steps=1e4,
         seed=0,  # overriden by the n_seeds parameter below
         cost_limit_linear_decrease=False,
         cost_limit_end_value=25,

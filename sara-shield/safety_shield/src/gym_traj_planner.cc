@@ -52,7 +52,7 @@ namespace safety_shield
                 std::vector<Motion> replanned_motions;
                 replanned_motions.reserve(steps_ahead_);
                 Eigen::Vector2d resampled_action = Eigen::Vector2d::Random(); // select random action in [-0.05; 0.05] x [-1,1], ctrl range limits
-                resampled_action(0) *= 0.05;
+                resampled_action(0) *= u0_max;
 
                 bool loop_ok = planner_point_loop(resampled_action, robot_vel, robot_rot, robot_com, policy_step, safety_radius, replanned_motions);
 
@@ -101,12 +101,13 @@ namespace safety_shield
             replanned_motions.reserve(steps_ahead_);
             // Optimal acceleration for braking
             double heading = atan2(robot_vel(1), robot_vel(0));
-            double phi = atan2(robot_rot(1, 0), robot_rot(0, 0));
-            double acc_opt = -1/timestep_ * (robot_vel(0) * cos(phi) + robot_vel(1) * sin(phi));
+            double theta = atan2(robot_rot(1, 0), robot_rot(0, 0));
+            double v_theta = robot_vel(0) * cos(theta) + robot_vel(1) * sin(theta);
+            double acc_opt = v_theta * (damping_ / point_mass_ - 1/timestep_);
             double v_abs = robot_vel.norm();
-            double u_1_opt = std::clamp(acc_opt * point_mass_ / gear_, -0.05, 0.05);
+            double u_1_opt = std::clamp(acc_opt * point_mass_ / gear_, -u0_max, u0_max);
             double d_u_1 = u_1_opt - action(0);
-            double delta_theta = heading - phi;
+            double delta_theta = heading - theta;
             if (abs(delta_theta) >= M_PI) {
                 delta_theta -= 2 * M_PI * sign(delta_theta);
             }
@@ -118,7 +119,7 @@ namespace safety_shield
                     act_theta = delta_theta + M_PI;
                 }
             }
-            double u_2_opt = std::clamp(act_theta / (gear_rot_ * timestep_), -1.0, 1.0);
+            double u_2_opt = std::clamp(act_theta * gear_ / timestep_, -1.0, 1.0);
             double d_u_2 = u_2_opt - action(1);
             // Check by how much we need to change velocity and steering angle to find solution.
             bool loop_ok = false;
@@ -155,22 +156,25 @@ namespace safety_shield
 
         for (int i = 1; i < steps_ahead_; i++)
         {
-            const double action_0_clip = std::clamp(action(0), -0.05, 0.05); // clip a_0 to Mujoco actuator range
-            double acc_h = gear_ * action_0_clip / point_mass_;
-
-            const double theta = regression_angle_point(action(1));
-
-            // integrate rotation matrix
+            // Rotational action
+            const double dtheta = rotation_action(action(1));
             Eigen::Matrix2d thetadot;
-            double ct = std::cos(theta);
-            double st = std::sin(theta);
+            double ct = std::cos(dtheta);
+            double st = std::sin(dtheta);
             thetadot << ct, -st, st, ct;
             robot_rot = robot_rot * thetadot;
-
+            // Translational action
+            const double action_0_clip = std::clamp(action(0), -u0_max, u0_max); // clip a_0 to Mujoco actuator range
+            double acc_h = gear_ * action_0_clip / point_mass_;
             Eigen::Vector2d acc_h_vector;
             acc_h_vector << acc_h, 0;
             acceleration = robot_rot * acc_h_vector;
-            robot_vel += timestep_ * acceleration - friction_ * robot_vel;
+            
+            robot_vel += timestep_ * (
+                acceleration -
+                damping_/point_mass_ * robot_vel -
+                robot_vel.cwiseSign() * friction_ * point_mass_ * gravity_
+            );
             robot_com += timestep_ * robot_vel;
 
             for (int j = 0; j < obstacles_.size(); j++)
@@ -204,13 +208,14 @@ namespace safety_shield
         action << 0, 0;
 
         const double heading = atan2(robot_vel(1), robot_vel(0));
-        const double phi = atan2(robot_rot(1, 0), robot_rot(0, 0));
-        double acc_opt = -1/timestep_ * (robot_vel(0) * cos(phi) + robot_vel(1) * sin(phi));
+        const double theta = atan2(robot_rot(1, 0), robot_rot(0, 0));
+        double v_theta = robot_vel(0) * cos(theta) + robot_vel(1) * sin(theta);
+        double acc_opt = v_theta * (damping_ / point_mass_ - 1/timestep_);
         double v_abs = robot_vel.norm();
         double delta_theta = 0;
         if (v_abs > 0.01) {
-            action(0) = std::clamp(acc_opt * point_mass_ / gear_, -0.05, 0.05);
-            delta_theta = heading - phi;
+            action(0) = std::clamp(acc_opt * point_mass_ / gear_, -u0_max, u0_max);
+            delta_theta = heading - theta;
             if (abs(delta_theta) >= M_PI) {
                 delta_theta -= 2 * M_PI * sign(delta_theta);
             }
@@ -224,7 +229,7 @@ namespace safety_shield
                     act_theta = delta_theta + M_PI;
                 }
             }
-            action(1) = std::clamp(act_theta / (gear_rot_ * timestep_), -1.0, 1.0);
+            action(1) = std::clamp(act_theta * gear_ / timestep_, -u1_max, u1_max);
         }
         return action;
     }
@@ -238,9 +243,9 @@ namespace safety_shield
 
         if (sign_vx > 0.5 || sign_vx < 0.5)
         {
-            action_1 = std::clamp(action_1, -0.05, 0.05);
+            action_1 = std::clamp(action_1, -u0_max, u0_max);
             double l1 = v_h(0) * timestep_ + timestep_ * timestep_ * (action_0 / 2);       // distance traveled in next timestep with planned action
-            double l2 = v_h(0) * timestep_ - timestep_ * timestep_ * (sign_vx * 0.05 / 2); // distance traveled in next timestep with slowdown
+            double l2 = v_h(0) * timestep_ - timestep_ * timestep_ * (sign_vx * u0_max / 2); // distance traveled in next timestep with slowdown
             action(1) = action_1 * (l2 / l1);
         }
         return action;
