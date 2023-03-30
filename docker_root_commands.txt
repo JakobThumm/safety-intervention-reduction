@@ -1,0 +1,2 @@
+docker build -f Dockerfile.root --build-arg MODE=root -t safety-intervention-reduction-base/$USER:v1 .
+docker run -it --volume "$(pwd):/home/safety-intervention-reduction/" safety-intervention-reduction-base/$USER:v1

@@ -72,7 +72,7 @@ RUN curl -LJO https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz && \
 #    && cd /.mujoco \
 #    && wget -qO- 'https://github.com/deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz' | tar -xzvf -
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME_PATH/.mujoco/mujoco210/bin"
-RUN sudo chmod -R 777 /usr/local/lib/python3.8/site-packages/mujoco_py/generated
+RUN sudo chmod -R 777 /usr/local/lib/python3.8/site-packages/mujoco_py
 
 USER $USERNAME
 
