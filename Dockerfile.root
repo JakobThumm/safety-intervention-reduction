@@ -1,0 +1,7 @@
+from ubuntu:20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# setup environment
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
