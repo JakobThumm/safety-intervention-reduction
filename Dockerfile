@@ -1,5 +1,11 @@
 FROM python:3.8
 
+ARG DEBIAN_FRONTEND=noninteractive
+
+# setup environment
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
 RUN apt-get -y update \
     && apt-get install --no-install-recommends -y \
     unzip \
@@ -14,53 +20,61 @@ RUN apt-get -y update \
     libgtest-dev \
     && apt-get autoremove -y \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    # Download mujoco
-    && mkdir /.mujoco \
-    && cd /.mujoco \
-    && wget -qO- 'https://github.com/deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz' | tar -xzvf -
+    && rm -rf /var/lib/apt/lists/*
 
-ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/.mujoco/mujoco210/bin"
+ENV DEBIAN_FRONTEND=dialog
 
-# # Args to provide in user mode
-# ARG USERNAME=robot
-# ARG USER_UID=1000
-# ARG USER_GID=$USER_UID
-# ## User settings
-# # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
-# RUN groupadd --gid $USER_GID $USERNAME \
-#     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-#     #
-#     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-#     && chmod 0440 /etc/sudoers.d/$USERNAME
+### USER settings
+ARG USERNAME=robot
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN groupadd --gid $USER_GID $USERNAME && \
+    useradd --create-home --no-log-init --uid $USER_UID --gid $USER_GID $USERNAME
 
+# ARG is scoped -> has to be set as environment variable
+ENV HOME_PATH=/home/$USERNAME
 
-WORKDIR /usr/
+## Copy repo directory
+COPY --chown=$USERNAME . $HOME_PATH/
+WORKDIR $HOME_PATH/
 
-COPY . /usr/workspace/
-WORKDIR /usr/workspace/
+####### Eigen 3 #######
 RUN wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz && \
     tar -xf eigen-3.4.0.tar.gz && \
     rm eigen-3.4.0.tar.gz && \
     mv eigen-* eigen_tmp && \
     mv eigen_tmp eigen-3.4.0 && \
     mkdir eigen-3.4.0/build
-WORKDIR /usr/workspace/eigen-3.4.0/build
+WORKDIR $HOME_PATH/eigen-3.4.0/build
 RUN cmake .. && make install
-ENV EIGEN3_INCLUDE_DIR="/usr/workspace/eigen-3.4.0/"
+ENV EIGEN3_INCLUDE_DIR="$HOME_PATH/eigen-3.4.0/"
 
-WORKDIR /usr/workspace/Safety_Gym
+###### Safety Gym ######
+WORKDIR $HOME_PATH/Safety_Gym
 RUN python3 -m pip install -e .
 
-WORKDIR /usr/workspace
+###### Base Repo ######
+WORKDIR $HOME_PATH
 RUN python3 -m pip install -r requirements.txt
 
-COPY . /usr/workspace/
-WORKDIR /usr/workspace/sara-shield
+###### Sara Shield ######
+WORKDIR $HOME_PATH/sara-shield
 RUN mv setup_no_conda.py setup.py
 RUN rm -r safety_shield/build && python3 setup.py install
 
+###### MUJOCO ######
+RUN mkdir $HOME_PATH/.mujoco
+WORKDIR $HOME_PATH/.mujoco
+RUN curl -LJO https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz && \
+    tar -xvf mujoco210-linux-x86_64.tar.gz && \
+    rm mujoco210-linux-x86_64.tar.gz
+#RUN mkdir /.mujoco \
+#    && cd /.mujoco \
+#    && wget -qO- 'https://github.com/deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz' | tar -xzvf -
+ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME_PATH/.mujoco/mujoco210/bin"
 RUN sudo chmod -R 777 /usr/local/lib/python3.8/site-packages/mujoco_py/generated
 
-WORKDIR /usr/workspace
+USER $USERNAME
+
+WORKDIR $HOME_PATH
 CMD ["python3", "app.py"]
