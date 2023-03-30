@@ -6,10 +6,10 @@ services:
     build:
       context: .
     volumes:
-      - ./data:/usr/workspace/data
-      - ./src:/usr/workspace/src
-      - ./app.py:/usr/workspace/app.py
-      - ./config_presets.py:/usr/workspace/config_presets.py
+      - ./data:/home/robot/data
+      - ./src:/home/robot/src
+      - ./app.py:/home/robot/app.py
+      - ./config_presets.py:/home/robot/config_presets.py
     user: ${CURRENT_UID}
     environment:
       - gym_env=Goal1
@@ -27,10 +27,10 @@ services:
     build:
       context: .
     volumes:
-      - ./data:/usr/workspace/data
-      - ./src:/usr/workspace/src
-      - ./app.py:/usr/workspace/app.py
-      - ./config_presets.py:/usr/workspace/config_presets.py
+      - ./data:/home/robot/data
+      - ./src:/home/robot/src
+      - ./app.py:/home/robot/app.py
+      - ./config_presets.py:/home/robot/config_presets.py
     user: ${CURRENT_UID}
     environment:
       - gym_env=Goal2
@@ -48,10 +48,10 @@ services:
     build:
       context: .
     volumes:
-      - ./data:/usr/workspace/data
-      - ./src:/usr/workspace/src
-      - ./app.py:/usr/workspace/app.py
-      - ./config_presets.py:/usr/workspace/config_presets.py
+      - ./data:/home/robot/data
+      - ./src:/home/robot/src
+      - ./app.py:/home/robot/app.py
+      - ./config_presets.py:/home/robot/config_presets.py
     user: ${CURRENT_UID}
     environment:
       - gym_env=Button1
@@ -69,10 +69,10 @@ services:
     build:
       context: .
     volumes:
-      - ./data:/usr/workspace/data
-      - ./src:/usr/workspace/src
-      - ./app.py:/usr/workspace/app.py
-      - ./config_presets.py:/usr/workspace/config_presets.py
+      - ./data:/home/robot/data
+      - ./src:/home/robot/src
+      - ./app.py:/home/robot/app.py
+      - ./config_presets.py:/home/robot/config_presets.py
     user: ${CURRENT_UID}
     environment:
       - gym_env=Button2
