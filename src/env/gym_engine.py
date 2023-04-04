@@ -43,7 +43,7 @@ ORIGIN_COORDINATES = np.zeros(3)
 DEFAULT_WIDTH = 256
 DEFAULT_HEIGHT = 256
 
-RADIUS_HAZARD = 0.20 # 32 for PID
+RADIUS_HAZARD = 0.26 # 32 for PID
 RADIUS_GREMLIN = 0.6
 RADIUS_VASE = 0.35
 RADIUS_PILLAR = 0.32
@@ -466,7 +466,7 @@ class NewEngine(Engine):
                 h_dist = self.dist_xy(h_pos)
                 if h_dist <= self.hazards_size:
                     cost['cost_hazards'] += self.hazards_cost * (self.hazards_size - h_dist)
-                    # print(f'Hazard cost: {cost["cost_hazards"]}')
+                    print(f'Hazard cost: {cost["cost_hazards"]}')
 
         if self.constrain_shield and self.failsafe_intervention:
             cost['cost_shield'] = 1

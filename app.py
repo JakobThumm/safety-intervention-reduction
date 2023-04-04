@@ -6,6 +6,7 @@ from rlpyt.utils.logging.context import logger_context
 
 from src.agents import CppoAgent, CppoLstmAgent
 from src.cpu_sampler import CpuSampler
+from rlpyt.samplers.serial.sampler import SerialSampler
 from src.gym_wrapper import SafetyGymTrajInfo, safety_gym_make
 from src.runner import MinibatchRl
 from src.env.suite import register_all
@@ -15,14 +16,27 @@ import os
 
 def make_runner(config):
     """Initialize all elements needed for training."""
-    affinity = affinity_from_code(config["slot_affinity_code"])
-    sampler = CpuSampler(
-        EnvCls=safety_gym_make,
-        env_kwargs=config["env"],
-        eval_env_kwargs=config["env"],
-        TrajInfoCls=SafetyGymTrajInfo,
-        **config["sampler"]
-    )
+    
+    if config["sampler"]["batch_B"] == 1:
+        # override slot affinity code to use only one CPU
+        slot_affinity_code = "0slt_0gpu_1cpu_1cpr_0saf"
+        sampler = SerialSampler(
+            EnvCls=safety_gym_make,
+            env_kwargs=config["env"],
+            eval_env_kwargs=config["env"],
+            TrajInfoCls=SafetyGymTrajInfo,
+            **config["sampler"]
+        )
+    else:
+        slot_affinity_code = config["slot_affinity_code"]
+        sampler = CpuSampler(
+            EnvCls=safety_gym_make,
+            env_kwargs=config["env"],
+            eval_env_kwargs=config["env"],
+            TrajInfoCls=SafetyGymTrajInfo,
+            **config["sampler"]
+        )
+    affinity = affinity_from_code(slot_affinity_code)
     algo = CppoPID(**config["algo"])
     agent = CppoLstmAgent(model_kwargs=config["model"], **config["agent"]) if config["use_lstm"] else CppoAgent(model_kwargs=config["model"], **config["agent"])
     runner = MinibatchRl(
@@ -88,10 +102,16 @@ def reward_search(config, exp_name, env_name):
 if __name__ == "__main__":
     # Register Safety Gym v1 environments (with shield use)
     register_all()
-
     # Get env name set in docker-compose file
-    exp_name = os.environ["exp_name"]
-    env_name = "Safexp-Point" + os.environ["gym_env"]+"-v1"
+    if "exp_name" in os.environ:
+        exp_name = os.environ["exp_name"]
+    else:
+        exp_name = "Shielded_PPO"
+    if "gym_env" in os.environ:
+        gym_env = os.environ["gym_env"]
+    else:
+        gym_env = "Goal1"
+    env_name = "Safexp-Point" + gym_env +"-v1"
     print(configs.keys())
     replacement_strat = configs[exp_name]["other"]["replacement_strat"]
     try:

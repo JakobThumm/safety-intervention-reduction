@@ -16,7 +16,7 @@ config = dict(
         batch_T=128,
         batch_B=3,  # Might bust memory limits.
         max_decorrelation_steps=1000,
-        eval_n_envs=3,
+        eval_n_envs=1,
         eval_max_steps=3000,
         eval_max_trajectories=3,
     ),
