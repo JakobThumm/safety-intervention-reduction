@@ -63,7 +63,7 @@ def average_all_seeds(csv_all_seeds, window_size=1):
     # create an empty list to store the numpy arrays
     steps = None
     value_dict = {
-        "Reward": [],
+        "Return": [],
         "Cost": [],
         "ShieldActivation": []
     }
@@ -73,7 +73,7 @@ def average_all_seeds(csv_all_seeds, window_size=1):
         df = pd.read_csv(csv_file)
         if steps is None:
             steps = df['Diagnostics/CumSteps'].values
-        value_dict['Reward'].append(df['ReturnAverage'].values)
+        value_dict['Return'].append(df['ReturnAverage'].values)
         value_dict['Cost'].append(df['CostAverage'].values)
         value_dict['ShieldActivation'].append(df['ShieldActivationAverage'].values)
 
@@ -102,7 +102,7 @@ def average_all_seeds(csv_all_seeds, window_size=1):
                 output_value_dict[key + "Average"][i-half_window] = np.mean(value_dict[key][:, i-half_window:i+half_window])
                 output_value_dict[key + "Std"][i-half_window] = np.std(value_dict[key][:, i-half_window:i+half_window])
         step[i-half_window] = steps[i]
-    output_value_dict['step'] = step
+    output_value_dict['TotalEnvInteracts'] = step
     # create a new dataframe with the calculated values
     output_df = pd.DataFrame(output_value_dict)
     return output_df
