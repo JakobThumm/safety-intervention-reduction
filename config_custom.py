@@ -82,6 +82,6 @@ config_custom = dict(
         reward_penalty = 0.1,
         constrain_shield = False,
         n_traj_new_tries = 0,
-        n_seeds = 5,
+        n_seeds = 15,
     ),
 )

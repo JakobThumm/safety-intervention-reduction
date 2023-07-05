@@ -26,7 +26,7 @@ ENV DEBIAN_FRONTEND=dialog
 
 ### USER settings
 ARG USERNAME=robot
-ARG USER_UID=1000
+ARG USER_UID=1009
 ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME && \
     useradd --create-home --no-log-init --uid $USER_UID --gid $USER_GID $USERNAME

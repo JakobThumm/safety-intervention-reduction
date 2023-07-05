@@ -91,7 +91,7 @@ config = dict(
         constrain_shield=False,
         n_traj_new_tries=0,
         max_traj_new_tries=20,
-        n_seeds=3,
+        n_seeds=15,
         replacement_strat="random",  # only if n_traj_new_tries > 0;
         # from grid, random, opposite, project
     ),
