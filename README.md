@@ -10,6 +10,7 @@ It is designed to work in a Docker container.
 
 The fastest way to use this code is with docker.
 It currently uses the `safety_intervention_reduction:1.0` image which can be built with `docker-compose build`.
+Start the docker swarm with `docker swarm init`.
 
 ## Run an experiment
 
