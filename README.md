@@ -23,6 +23,14 @@ The `STACK_NAME` parameter is used to differentiate between different [docker st
 Alternatively to `docker stack`, one can also use `CURRENT_UID=$(id -u):$(id -g) EXP_NAME=XXX docker-compose up`.
 
 To select an experiment, one must modify the exp_name parameter can be chosen among the following:
+ - `PPO`: PPO agent. 
+    ```[bash]
+    CURRENT_UID=$(id -u):$(id -g) EXP_NAME=PPO docker stack deploy --compose-file docker-compose.yml ppo
+    ``` 
+ - `PID`: PID agent. 
+    ```[bash]
+    CURRENT_UID=$(id -u):$(id -g) EXP_NAME=PID docker stack deploy --compose-file docker-compose.yml pid
+    ``` 
  - `Shielded_PPO`: PPO with provably safe shield that stops the agent from colliding. 
     ```[bash]
     CURRENT_UID=$(id -u):$(id -g) EXP_NAME=Shielded_PPO docker stack deploy --compose-file docker-compose.yml shielded_ppo

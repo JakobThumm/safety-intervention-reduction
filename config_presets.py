@@ -91,11 +91,23 @@ config = dict(
         constrain_shield=False,
         n_traj_new_tries=0,
         max_traj_new_tries=20,
-        n_seeds=15,
+        n_seeds=10,
         replacement_strat="random",  # only if n_traj_new_tries > 0;
         # from grid, random, opposite, project
     ),
 )
+
+# PPO
+configs["PPO"] = copy.deepcopy(config)
+configs["PPO"]["other"]["activate_shield"] = False
+configs["PPO"]["algo"]["cost_limit"] = 100000
+
+# Shielded PID Lagrangian
+configs["PID"] = copy.deepcopy(config)
+configs["PPO"]["other"]["activate_shield"] = False
+configs["PID"]["other"]["reward_shield"] = False
+configs["PID"]["other"]["constrain_shield"] = False
+configs["PID"]["algo"]["cost_limit"] = 25
 
 # Shielded PPO
 configs["Shielded_PPO"] = copy.deepcopy(config)
