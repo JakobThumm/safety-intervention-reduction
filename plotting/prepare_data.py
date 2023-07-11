@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import argparse
 import numpy as np
+from scipy.stats import bootstrap
 
 
 def create_csv_paths_dict(root_dir):
@@ -92,17 +93,36 @@ def average_all_seeds(csv_all_seeds, window_size=1):
             length = value_dict[key].shape[1]-2*half_window
         output_value_dict[key + "Average"] = np.zeros(value_dict[key].shape[1]-2*half_window)
         output_value_dict[key + "Std"] = np.zeros(value_dict[key].shape[1]-2*half_window)
+        output_value_dict[key + "Bootstrap025"] = np.zeros(value_dict[key].shape[1]-2*half_window)
+        output_value_dict[key + "Bootstrap975"] = np.zeros(value_dict[key].shape[1]-2*half_window)
     step = np.zeros(length)
     for i in range(half_window, length+half_window):
         for key in value_dict:
             if window_size == 1:
                 output_value_dict[key + "Average"][i-half_window] = np.mean(value_dict[key][:, i])
                 output_value_dict[key + "Std"][i-half_window] = np.std(value_dict[key][:, i])
+                data = value_dict[key][:, i]
+                res = bootstrap(data=data[np.newaxis, :],
+                                statistic=np.mean,
+                                confidence_level=0.95,
+                                axis=0,
+                                n_resamples=1000)
+                output_value_dict[key + "Bootstrap025"][i-half_window] = res.confidence_interval.low
+                output_value_dict[key + "Bootstrap975"][i-half_window] = res.confidence_interval.high
             else:
                 output_value_dict[key + "Average"][i-half_window] = np.mean(value_dict[key][:, i-half_window:i+half_window])
                 output_value_dict[key + "Std"][i-half_window] = np.std(value_dict[key][:, i-half_window:i+half_window])
+                data = np.concatenate(value_dict[key][:, i-half_window:i+half_window], axis=0)
+                res = bootstrap(data=data[np.newaxis, :],
+                                statistic=np.mean,
+                                confidence_level=0.95,
+                                axis=0,
+                                n_resamples=1000)
+                output_value_dict[key + "Bootstrap025"][i-half_window] = res.confidence_interval.low
+                output_value_dict[key + "Bootstrap975"][i-half_window] = res.confidence_interval.high
         step[i-half_window] = steps[i]
     output_value_dict['TotalEnvInteracts'] = step
+    # value_dict['ShieldActivation'][:, 100]
     # create a new dataframe with the calculated values
     output_df = pd.DataFrame(output_value_dict)
     return output_df
