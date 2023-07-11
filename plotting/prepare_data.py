@@ -106,7 +106,7 @@ def average_all_seeds(csv_all_seeds, window_size=1):
                                 statistic=np.mean,
                                 confidence_level=0.95,
                                 axis=0,
-                                n_resamples=1000)
+                                n_resamples=10000)
                 output_value_dict[key + "Bootstrap025"][i-half_window] = res.confidence_interval.low
                 output_value_dict[key + "Bootstrap975"][i-half_window] = res.confidence_interval.high
             else:
@@ -117,7 +117,7 @@ def average_all_seeds(csv_all_seeds, window_size=1):
                                 statistic=np.mean,
                                 confidence_level=0.95,
                                 axis=0,
-                                n_resamples=1000)
+                                n_resamples=10000)
                 output_value_dict[key + "Bootstrap025"][i-half_window] = res.confidence_interval.low
                 output_value_dict[key + "Bootstrap975"][i-half_window] = res.confidence_interval.high
         step[i-half_window] = steps[i]
