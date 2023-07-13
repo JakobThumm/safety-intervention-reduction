@@ -56,7 +56,7 @@ class NewEngine(Engine):
 
         self.robot_type = config["robot_base"].split('/')[-1][:-4]
 
-        self.use_safety_shield = config_shield.VARIABLE_DEGEU_POUR_SHIELD
+        self.use_safety_shield = config_shield.ACTIVATE_SHIELD
         self.constrain_shield = config_shield.CONSTRAIN_SHIELD
         self.safety_shield = None
         self.desired_motion = None
@@ -466,7 +466,6 @@ class NewEngine(Engine):
                 h_dist = self.dist_xy(h_pos)
                 if h_dist <= self.hazards_size:
                     cost['cost_hazards'] += self.hazards_cost * (self.hazards_size - h_dist)
-                    print(f'Hazard cost: {cost["cost_hazards"]}')
 
         if self.constrain_shield and self.failsafe_intervention:
             cost['cost_shield'] = 1

@@ -22,7 +22,7 @@ exp_name = "Shielded_PPO" # From config_presets.possible
 env_name = "Safexp-PointGoal1-v1"
 use_agent = False
 VISUALIZE = True
-AGENT_PATH = "/home/jakob/Promotion/code/safety-intervention-reduction/data/local/20230328/205546/PointGoal1/run_Shielded_PPO_0/params.pkl"
+AGENT_PATH = "/home/jakob/Promotion/code/safety-intervention-reduction/data/local/20230331/043419/PointGoal1/run_Shielded_PPO_2/params.pkl"
 
 def make_env_agent(config):
     env = safety_gym_make(**config["env"])
@@ -127,9 +127,7 @@ def run_random_angle(env_name, config, act):
             break
     print(f"Action : {act[1]}, Result : {sum_delta/steps}")
 
-def run_random_speed(env_name, config):
-    config["env"]["id"] = env_name
-    env = safety_gym_make(**config["env"])
+def run_random_speed(env, config):
     obs = env.reset()
     done = False
     ep_ret = 0
@@ -198,7 +196,7 @@ def run_random(env, agent=None):
     ep_ret = 0
     ep_cost = 0
     t = 0
-    t_max = 300
+    t_max = 1000
 
     envs = 100
     # while True:
@@ -209,7 +207,7 @@ def run_random(env, agent=None):
             if use_agent:
                 act = get_agent_action(obs, act, r)
             else:
-                act = [0.03, -0.3]
+                act = [0.001, -0.15]
             obs, r, done, info = env.step(act)
             ep_ret += r
             if VISUALIZE:

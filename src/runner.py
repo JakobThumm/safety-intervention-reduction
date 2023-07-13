@@ -254,7 +254,7 @@ class MinibatchRl(MinibatchRlBase):
         ``sampler.obtain_samples()`` and ``algo.optimize_agent()``, logging
         diagnostics at the specified interval.
         """
-        config_shield.activate_shield(True)
+        # config_shield.activate_shield(True)
         n_itr = self.startup()
         # print(n_itr)
         cost_limit_end = self.algo.cost_limit

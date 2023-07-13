@@ -18,7 +18,7 @@ class ConfigShield:
     def update_config(self, cfg):
         '''Update the current configuration with a new config dict'''
         cfg = cfg["other"]
-        self.VARIABLE_DEGEU_POUR_SHIELD = cfg["activate_shield"]
+        self.ACTIVATE_SHIELD = cfg["activate_shield"]
         self.REWARD_SHIELD = cfg["reward_shield"]
         self.CONSTRAIN_SHIELD = cfg["constrain_shield"]
         self.REWARD_PENALTY = cfg["reward_penalty"]
@@ -36,7 +36,7 @@ class ConfigShield:
 
     def activate_shield(self, activate):
         '''Toggle shield activation'''
-        self.VARIABLE_DEGEU_POUR_SHIELD = activate
+        self.ACTIVATE_SHIELD = activate
 
 # initialize config when this file is loaded
 config_shield = ConfigShield.get_instance()

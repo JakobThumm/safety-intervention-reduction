@@ -39,7 +39,7 @@ config = dict(
         objective_penalized=True,
         learn_c_value=True,
         penalty_init=0.,
-        cost_limit=25,
+        cost_limit=100000,
         cost_scale=10,  # yes 10.
         normalize_cost_advantage=False,
         pid_Kp=1e-3,
@@ -104,7 +104,7 @@ configs["PPO"]["algo"]["cost_limit"] = 100000
 
 # Shielded PID Lagrangian
 configs["PID"] = copy.deepcopy(config)
-configs["PPO"]["other"]["activate_shield"] = False
+configs["PID"]["other"]["activate_shield"] = False
 configs["PID"]["other"]["reward_shield"] = False
 configs["PID"]["other"]["constrain_shield"] = False
 configs["PID"]["algo"]["cost_limit"] = 25

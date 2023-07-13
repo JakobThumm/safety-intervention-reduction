@@ -122,6 +122,8 @@ if __name__ == "__main__":
     configs[exp_name]["other"]["replacement_strat"] = replacement_strat
 
     if exp_name in configs.keys():
+        print("Training config {}".format(exp_name))
+        print(configs[exp_name])
         train_regular(configs[exp_name], f"{exp_name}_{replacement_strat}", env_name)
     elif exp_name == "Constraint_Search":
         constraint_search(configs["search"][exp_name], f"{exp_name}_{replacement_strat}", env_name)
